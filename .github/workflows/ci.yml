@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt, llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov,cargo-audit
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -W clippy::pedantic
+      - name: Tests with coverage (Jev mocked)
+        run: cargo llvm-cov --fail-under-lines 90 --summary-only
+      - run: cargo audit
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Playwright API tests (offline signals)
+        working-directory: e2e
+        env:
+          E2E_SIGNAL_MODE: mock
+        run: |
+          npm ci
+          npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: e2e/playwright-report

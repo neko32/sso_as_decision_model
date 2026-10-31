@@ -1,0 +1,28 @@
+# Deterministic part of the decision model: Policy x Role x Time.
+# Contextual signals (Device / Location / Risk / unusual time) come from Jev.
+thresholds:
+  step_up_risk: 1.0      # expected risk (0=low .. 3=critical) that triggers MFA
+  deny_risk: 2.0         # expected risk that denies outright
+  step_up_location: 0.6  # P(implausible location) that triggers MFA
+  step_up_time: 0.7      # P(unusual login time) that triggers MFA
+
+policies:
+  - resource: payroll
+    actions: [read, write]
+    roles: [hr, admin]
+    hours: { start: 7, end: 22 }
+    require_managed_device: true
+
+  - resource: source-code
+    actions: [read, write]
+    roles: [engineer, admin]
+    require_managed_device: true
+
+  - resource: wiki
+    actions: [read]
+    roles: [engineer, hr, sales, admin]
+
+  - resource: admin-console
+    actions: [read, write]
+    roles: [admin]
+    require_managed_device: true

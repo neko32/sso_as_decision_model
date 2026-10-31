@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dependencies</title>
+<style>
+  :root { --bg:#f8fafc; --fg:#0f172a; --muted:#64748b; --line:#e2e8f0; --card:#fff; --accent:#4f46e5; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f172a; --fg:#e2e8f0; --muted:#94a3b8; --line:#1e293b; --card:#111827; --accent:#a5b4fc; } }
+  body { margin:0; padding:32px 16px; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui, sans-serif; }
+  main { max-width:960px; margin:0 auto; }
+  h1 { margin:0 0 4px; } p.sub { color:var(--muted); margin:0 0 24px; }
+  h2 { margin:28px 0 8px; font-size:18px; color:var(--accent); }
+  table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  th, td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:13px; color:var(--muted); font-weight:600; }
+  td:nth-child(2) { font-family:ui-monospace, Consolas, monospace; white-space:nowrap; }
+  .wrap { overflow-x:auto; }
+</style>
+</head>
+<body>
+<main>
+<h1>Dependencies</h1>
+<p class="sub">SSO as a Decision Model · versions as locked on 2026-10-31 · <code>cargo audit</code>: 0 vulnerabilities, 0 warnings</p>
+
+<h2>Backend (Rust, app/)</h2>
+<div class="wrap"><table>
+<tr><th>Crate</th><th>Version</th><th>Purpose</th></tr>
+<tr><td>axum</td><td>0.8.9</td><td>HTTP routing for the AuthZEN PDP endpoints</td></tr>
+<tr><td>tokio</td><td>1.54.1</td><td>Async runtime, TCP listener, Ctrl-C graceful shutdown</td></tr>
+<tr><td>reqwest</td><td>0.13.5</td><td>HTTP client for Jev (rustls + aws-lc-rs, no OpenSSL)</td></tr>
+<tr><td>serde</td><td>1.0.229</td><td>(De)serialisation derive for DTOs and policy</td></tr>
+<tr><td>serde_json</td><td>1.0.154</td><td>JSON bodies and the free-form request context</td></tr>
+<tr><td>serde-saphyr</td><td>2.0.0</td><td>Pure-Rust, panic-free YAML parsing for policy.yaml</td></tr>
+<tr><td>chrono</td><td>0.4.45</td><td>RFC 3339 time parsing and local business hours</td></tr>
+<tr><td>thiserror</td><td>2.0.21</td><td>Typed error enums</td></tr>
+<tr><td>tracing</td><td>0.1.44</td><td>Structured logging</td></tr>
+<tr><td>tracing-subscriber</td><td>0.3.23</td><td>Log formatting, RUST_LOG filter</td></tr>
+<tr><td>dotenvy</td><td>0.15.7</td><td>Loads optional .env file</td></tr>
+</table></div>
+
+<h2>Backend tests (dev-dependencies)</h2>
+<div class="wrap"><table>
+<tr><th>Crate</th><th>Version</th><th>Purpose</th></tr>
+<tr><td>wiremock</td><td>0.6.5</td><td>HTTP stub of the Jev API for integration tests</td></tr>
+<tr><td>tower</td><td>0.5.3</td><td><code>ServiceExt::oneshot</code> to drive the router in-process</td></tr>
+<tr><td>http-body-util</td><td>0.1.5</td><td>Collect response bodies in tests</td></tr>
+</table></div>
+
+<h2>E2E (Node, e2e/)</h2>
+<div class="wrap"><table>
+<tr><th>Package</th><th>Version</th><th>Purpose</th></tr>
+<tr><td>@playwright/test</td><td>1.64.1</td><td>API persona scenarios via APIRequestContext; also renders the architecture PNG</td></tr>
+<tr><td>typescript</td><td>7.0.2</td><td>Type checking for the test suite</td></tr>
+<tr><td>@types/node</td><td>26.6.6</td><td>Node type definitions</td></tr>
+</table></div>
+
+<h2>External service</h2>
+<div class="wrap"><table>
+<tr><th>Service</th><th>Version</th><th>Purpose</th></tr>
+<tr><td>Jev (TypeSafe System One)</td><td>jev-1.14.0</td><td>Decision model answering device / location / time / risk questions with probabilities</td></tr>
+</table></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .h { font-size: 22px; font-weight: 700; fill: #0f172a; }
+      .t { font-size: 17px; fill: #334155; }
+      .s { font-size: 15px; fill: #64748b; }
+      .m { font-family: 'JetBrains Mono', Consolas, monospace; font-size: 15px; fill: #1e293b; }
+      .chip { font-size: 16px; font-weight: 600; text-anchor: middle; }
+      .line { stroke: #475569; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f8fafc"/>
+
+  <text x="60" y="68" font-size="38" font-weight="800" fill="#0f172a">SSO as a Decision Model</text>
+  <text x="60" y="106" class="t">Every SSO login is a decision: 7 signals in → <tspan font-weight="700" fill="#15803d">Allow</tspan> / <tspan font-weight="700" fill="#b45309">Step-up MFA</tspan> / <tspan font-weight="700" fill="#b91c1c">Deny</tspan> out, with a reason for every factor.</text>
+
+  <!-- Client -->
+  <rect x="60" y="330" width="250" height="150" rx="14" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+  <text x="80" y="366" class="h">IdP / App</text>
+  <text x="80" y="396" class="t">SSO login attempt</text>
+  <text x="80" y="428" class="m">POST /access/v1/</text>
+  <text x="80" y="448" class="m">     evaluation</text>
+  <text x="80" y="470" class="s">OpenID AuthZEN</text>
+  <path d="M310 405 L382 405" class="line"/>
+
+  <!-- PDP container -->
+  <rect x="390" y="150" width="800" height="580" rx="18" fill="#eef2ff" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="414" y="184" class="h" fill="#3730a3">Rust PDP · Axum + Tokio</text>
+  <text x="1166" y="184" class="s" text-anchor="end">stateless · fail-closed</text>
+
+  <!-- 1 validate -->
+  <rect x="414" y="204" width="752" height="58" rx="10" fill="#fff" stroke="#c7d2fe"/>
+  <text x="434" y="240" class="t"><tspan font-weight="700">① Validate</tspan>  newtypes for ids, roles, actions, probabilities · bad input → 400</text>
+
+  <!-- 2 gate -->
+  <rect x="414" y="282" width="752" height="128" rx="10" fill="#fff" stroke="#c7d2fe"/>
+  <text x="434" y="314" class="t"><tspan font-weight="700">② Deterministic gate</tspan>  policy.yaml · Rust rules · ~10 ms</text>
+  <g>
+    <rect x="434" y="330" width="160" height="40" rx="20" fill="#e0e7ff"/><text x="514" y="356" class="chip" fill="#3730a3">Identity</text>
+    <rect x="606" y="330" width="160" height="40" rx="20" fill="#e0e7ff"/><text x="686" y="356" class="chip" fill="#3730a3">Policy</text>
+    <rect x="778" y="330" width="160" height="40" rx="20" fill="#e0e7ff"/><text x="858" y="356" class="chip" fill="#3730a3">Role</text>
+    <rect x="950" y="330" width="160" height="40" rx="20" fill="#e0e7ff"/><text x="1030" y="356" class="chip" fill="#3730a3">Time (hours)</text>
+  </g>
+  <text x="434" y="396" class="s">any rule fails → Deny immediately, the model is never called (saves cost, keeps hard rules hard)</text>
+
+  <!-- 3 signals -->
+  <rect x="414" y="430" width="752" height="128" rx="10" fill="#fff" stroke="#c7d2fe"/>
+  <text x="434" y="462" class="t"><tspan font-weight="700">③ Contextual signals</tspan>  minimised state (no user id) → one batched call</text>
+  <g>
+    <rect x="434" y="478" width="160" height="40" rx="20" fill="#fef3c7"/><text x="514" y="504" class="chip" fill="#92400e">Device</text>
+    <rect x="606" y="478" width="160" height="40" rx="20" fill="#fef3c7"/><text x="686" y="504" class="chip" fill="#92400e">Location</text>
+    <rect x="778" y="478" width="160" height="40" rx="20" fill="#fef3c7"/><text x="858" y="504" class="chip" fill="#92400e">Unusual time</text>
+    <rect x="950" y="478" width="160" height="40" rx="20" fill="#fef3c7"/><text x="1030" y="504" class="chip" fill="#92400e">Risk</text>
+  </g>
+  <text x="434" y="544" class="s">trait SignalProvider → JevClient | RuleBased mock (CI) | Static stub (unit tests)</text>
+
+  <!-- 4 combine -->
+  <rect x="414" y="578" width="752" height="128" rx="10" fill="#fff" stroke="#c7d2fe"/>
+  <text x="434" y="610" class="t"><tspan font-weight="700">④ Combine + trace</tspan>  thresholds from policy.yaml · strictest effect wins</text>
+  <text x="434" y="642" class="m">compromised → Deny  ·  risk ≥ 2.0 → Deny  ·  risk ≥ 1.0 → Step-up</text>
+  <text x="434" y="666" class="m">P(odd location) ≥ 0.6 → Step-up  ·  BYOD on managed-only app → Step-up</text>
+  <text x="434" y="692" class="s">every factor emits {factor, source: rule|model|system, effect, detail}</text>
+
+  <!-- Jev -->
+  <path d="M1166 494 L1262 494" class="line"/>
+  <path d="M1262 530 L1174 530" class="line"/>
+  <text x="1200" y="484" class="s">state</text>
+  <text x="1200" y="552" class="s">answers</text>
+  <rect x="1270" y="400" width="290" height="210" rx="14" fill="#fff7ed" stroke="#f59e0b" stroke-width="2.5"/>
+  <text x="1290" y="436" class="h" fill="#9a3412">Jev · System One</text>
+  <text x="1290" y="462" class="s">TypeSafe · jev-1.14.0 (pinned)</text>
+  <text x="1290" y="496" class="m">choice device_trust</text>
+  <text x="1290" y="522" class="m">noul   location_anomaly</text>
+  <text x="1290" y="548" class="m">noul   time_anomaly</text>
+  <text x="1290" y="574" class="m">score  risk (0–3)</text>
+  <text x="1290" y="598" class="s">probabilities, not prose</text>
+  <rect x="1270" y="630" width="290" height="76" rx="12" fill="#fef2f2" stroke="#fca5a5"/>
+  <text x="1290" y="660" class="t" font-weight="700" fill="#b91c1c">Fail-closed</text>
+  <text x="1290" y="686" class="s">timeout · 4xx/5xx · bad schema → Deny</text>
+
+  <!-- outputs -->
+  <path d="M790 730 L790 762" class="line"/>
+  <rect x="414" y="770" width="230" height="56" rx="28" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="529" y="805" class="chip" font-size="20" fill="#15803d">Allow · decision: true</text>
+  <rect x="675" y="770" width="230" height="56" rx="28" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text x="790" y="805" class="chip" font-size="20" fill="#b45309">Step-up · require MFA</text>
+  <rect x="936" y="770" width="230" height="56" rx="28" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="1051" y="805" class="chip" font-size="20" fill="#b91c1c">Deny · with reason</text>
+
+  <text x="60" y="866" class="s">Tested with Playwright persona scenarios (mock + live Jev) · wiremock contract tests · cargo-llvm-cov 95% lines · clippy pedantic · cargo audit clean</text>
+</svg>
